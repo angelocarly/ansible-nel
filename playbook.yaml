@@ -1,4 +1,4 @@
-- name: User setup
+- name: Server setup
   hosts: myhosts
   tasks:
    - name: Install zsh
@@ -6,3 +6,17 @@
       name: zsh
       update_cache: yes
       state: present
+
+   - name: Add user
+     ansible.builtin.user:
+      name: server
+      shell: /bin/zsh
+      groups: root
+      append: yes
+
+   - name: Set authorized keys
+     ansible.posix.authorized_key:
+      user: server
+      state: present
+      key: "{{ lookup('file', './authorized_keys')}}"
+
