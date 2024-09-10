@@ -1,6 +1,19 @@
 - name: System dependencies
   hosts: myhosts
   tasks:
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+        state: latest
+        update_cache: true
+
     - name: Add Docker GPG apt Key
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
@@ -16,3 +29,38 @@
         name: docker-ce
         state: latest
         update_cache: true
+
+    - name: Install Docker module for python
+      apt:
+        name: python3-docker
+        state: latest
+        update_cache: true
+
+    - name: Add Docker group
+      become: yes
+      become_user: server
+      ansible.builtin.group:
+        name: docker
+        state: present
+
+    - name: Add user to Docker group
+      become: yes
+      become_user: server
+      ansible.builtin.user:
+        name: server
+        groups: docker
+        append: true
+
+    - name: Copy proxy manager config
+      become: yes
+      become_user: server
+      copy:
+        src: ../data/proxy-manager
+        dest: ~/
+        owner: server
+
+    - name: Start proxy manager docker
+      become: yes
+      become_user: server
+      community.docker.docker_compose_v2:
+        project_src: ~/proxy-manager
