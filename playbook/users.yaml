@@ -33,7 +33,7 @@
      ansible.posix.authorized_key:
       user: server
       state: present
-      key: "{{ lookup('file', './authorized_keys')}}"
+      key: "{{ lookup('file', '../data/authorized_keys')}}"
 
    - name: Download Oh My Zsh installation script
      become: yes
