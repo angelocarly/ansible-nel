@@ -1,4 +1,10 @@
 # Nel.re ansible
 
 ## Commands
-- `ansible-inventory -i inventory.ini --list`
+
+Following [this](https://docs.ansible.com/ansible/latest/getting_started/get_started_inventory.html)
+
+- Verify the hosts
+  - `ansible-inventory -i inventory.ini --list`
+- Ping the `myhosts` group
+  - `ansible myhosts -m ping -i inventory.ini -u root`
