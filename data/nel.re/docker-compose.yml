@@ -1,0 +1,17 @@
+services:
+  nel.re:
+    container_name: nel.re
+    image: 'nginx:latest'
+    restart: unless-stopped
+    ports:
+      - '2000:80'
+
+    volumes:
+      - ./data:/usr/share/nginx/html
+
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    driver: bridge

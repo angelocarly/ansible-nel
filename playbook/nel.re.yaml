@@ -1,0 +1,17 @@
+- name: Install nel.re webserver
+  hosts: myhosts
+  tasks:
+
+    - name: Copy nel.re config
+      become: yes
+      become_user: server
+      copy:
+        src: ../data/nel.re
+        dest: ~/
+        owner: server
+
+    - name: Start nel.re docker
+      become: yes
+      become_user: server
+      community.docker.docker_compose_v2:
+        project_src: ~/nel.re

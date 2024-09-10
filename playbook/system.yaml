@@ -59,6 +59,22 @@
         dest: ~/
         owner: server
 
+    - name: Create data directory
+      become: yes
+      become_user: server
+      ansible.builtin.file:
+        path: ~/proxy-manager/data
+        state: directory
+        mode: '0755'
+
+    - name: Create letsencrypt directory
+      become: yes
+      become_user: server
+      ansible.builtin.file:
+        path: ~/proxy-manager/letsencrypt
+        state: directory
+        mode: '0755'
+
     - name: Start proxy manager docker
       become: yes
       become_user: server
