@@ -1,4 +1,4 @@
-- name: Server setup
+- name: Server user setup
   hosts: myhosts
   tasks:
    - name: Install zsh
@@ -7,12 +7,27 @@
       update_cache: yes
       state: present
 
+   - name: Add wheel group
+     group:
+      name: wheel
+      state: present
+
+   - name: Allow 'wheel' group to have passwordless sudo
+     lineinfile:
+      dest: /etc/sudoers
+      state: present
+      regexp: '^%wheel'
+      line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+      validate: 'visudo -cf %s'
+
    - name: Add user
      ansible.builtin.user:
       name: server
       shell: /bin/zsh
-      groups: root
+      groups: wheel
       append: yes
+      state: present
+      createhome: yes
 
    - name: Set authorized keys
      ansible.posix.authorized_key:
@@ -20,3 +35,60 @@
       state: present
       key: "{{ lookup('file', './authorized_keys')}}"
 
+   - name: Download Oh My Zsh installation script
+     become: yes
+     become_user: server
+     get_url:
+      url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+      dest: /tmp/install_ohmyzsh.sh
+
+   - name: Run Oh My Zsh installation script
+     become: yes
+     become_user: server
+     command: sh /tmp/install_ohmyzsh.sh --unattended
+     register: ohmyzsh_result
+     failed_when: "'FAILED' in ohmyzsh_result.stderr"
+
+   - name: Install bat
+     ansible.builtin.apt:
+      name: bat
+      state: present
+
+   - name: Create local bin folder
+     become: yes
+     become_user: server
+     ansible.builtin.command: mkdir -p ~/.local/bin
+
+   - name: Link bat
+     become: yes
+     become_user: server
+     ansible.builtin.command: ln -nsf /usr/bin/batcat ~/.local/bin/bat
+
+   - name: Install eza
+     ansible.builtin.apt:
+      name: eza
+      state: present
+
+   - name: Install fzf
+     ansible.builtin.apt:
+      name: fzf
+      state: present
+
+   - name: Git checkout
+     become: yes
+     become_user: server
+     ansible.builtin.git:
+      repo: 'https://github.com/angelocarly/dotfiles.git'
+      dest: /home/server/.dotfiles
+
+   - name: Remove .zshrc
+     ansible.builtin.file:
+      path: /home/server/.zshrc
+      state: absent
+
+   - name: Install dotfiles
+     become: yes
+     become_user: server
+     ansible.builtin.shell: 
+      cmd: ./install
+      chdir: ~/.dotfiles
