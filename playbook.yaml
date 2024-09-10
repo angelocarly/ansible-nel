@@ -1,9 +1,8 @@
-- name: My first play
+- name: User setup
   hosts: myhosts
   tasks:
-   - name: Ping my hosts
-     ansible.builtin.ping:
-
-   - name: Print message
-     ansible.builtin.debug:
-      msg: Hello world
+   - name: Install zsh
+     ansible.builtin.apt:
+      name: zsh
+      update_cache: yes
+      state: present
