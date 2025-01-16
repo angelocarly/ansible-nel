@@ -1,0 +1,17 @@
+- name: Install memgraph docker
+  hosts: myhosts
+  tasks:
+
+    - name: Copy graph config
+      become: yes
+      become_user: server
+      copy:
+        src: ../data/graph
+        dest: ~/
+        owner: server
+
+    - name: Start neo4j docker
+      become: yes
+      become_user: server
+      community.docker.docker_compose_v2:
+        project_src: ~/graph

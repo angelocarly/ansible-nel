@@ -1,0 +1,17 @@
+- name: Install viviweyers webserver
+  hosts: myhosts
+  tasks:
+
+    - name: Copy viviweyers config
+      become: yes
+      become_user: server
+      copy:
+        src: ../data/viviweyers
+        dest: ~/
+        owner: server
+
+    - name: Start nel.re docker
+      become: yes
+      become_user: server
+      community.docker.docker_compose_v2:
+        project_src: ~/viviweyers

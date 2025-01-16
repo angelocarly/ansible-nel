@@ -1,0 +1,17 @@
+services:
+  viviweyers:
+    container_name: viviweyers
+    image: 'nginx:latest'
+    restart: unless-stopped
+    ports:
+      - '2001:80'
+
+    volumes:
+      - ./data:/usr/share/nginx/html
+
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    driver: bridge
